@@ -5,7 +5,7 @@ BEGIN
 	SET NOCOUNT ON;
 
 	---------------------------------------------------------------------------
-	/*
+
 	IF(SELECT COUNT(*) FROM [sys].[indexes] WHERE [name] = 'IX_MariaDbSlowLog_QueryStatementCheckSum') = 1
 		DROP INDEX [IX_MariaDbSlowLog_QueryStatementCheckSum] ON [dbo].[MariaDbSlowLog];
 
@@ -15,7 +15,7 @@ BEGIN
 	WHERE LineText LIKE '/usr/%'
 	   OR LineText LIKE 'Tcp port: %'
 	   OR LineText LIKE 'Time   %';
-	*/
+
 	---------------------------------------------------------------------------
 
 	-- Use these to delimit block of lines that belong together
