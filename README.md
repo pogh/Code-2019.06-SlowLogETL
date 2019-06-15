@@ -12,7 +12,6 @@ to ‘optimise’ is one of those things.  I’ve been given this task, but no o
 MariaDb writes an entry into a ‘slow query log’ if a query takes more than a certain threshold.  The file size for
 our log for a database that is not really that busy is 7GB.  The network admin uses mysterious script to summarise the raw data but I decide to load the ‘slow query log’ itself to perform some analysis that way.
 
-
 ## Visual Studio Solution
 
 I created a Visual Studio Solution with two projects:
@@ -25,7 +24,7 @@ I created a Visual Studio Solution with two projects:
 ### Database Project
 
 This is not about Database Projects per se, but I can really recommend considering them.  You can put your databases into source control and all those other good things that come with that.
-In this project, I’ve created two tables and a stored procedure.
+In this project, I’ve created two schemas, one to hold the staging tables and stored procedure, and one to hold the results.
 
 ![ProjectDatabase](./images/ProjectDatabase.png)
 
@@ -51,7 +50,7 @@ The SSIS project has a single package to read in the text file.
 
 #### Control Flow
 
-The control flow clears the staging table, loads the text file into the staging table, and the stored procedure transforms it and loads it into the result table. 
+The control flow clears the staging table, loops through all log files in a temp directory and loads each file into the staging table.  The stored procedure processes the staging table and loads the results into the result table.
 
 ![SSISControlFlow](./images/SSISControlFlow.png)
 
@@ -92,6 +91,36 @@ And this is what the final result looks like after the stored procedure has run:
 
 ![RowsTableMariaDbSlowLog](./images/RowsTableMariaDbSlowLog.png)
 
-Now we can query the table to find out which queries took a long time, or which ones executed particularly often, etc.
+Now we can query the table to find out lot’s of interesting things.  Time to harness the power of Power BI.
 
-Beats a text file!
+## Power BI
+
+Here’s a report I through together.  Beats a text file, processed or unprocessed, is a starting point for us to find out where the pain points are.
+
+### Database Load
+
+This shows basic load on the database.  Top graphs shows the numbe of queries, the bottom graph shows the number of rows being returned.  We can see the sync running every half an hour.  You can also click on the graph and it will show the queries running at that time point.
+
+![PBI_1](./images/PBI_1.png)
+
+### High Cost Queries
+
+This shows the quick wins.  “High Cost” is defined as the gap between the number of rows examined vs. the number of rows return, i.e. those queries that could benefit from an index.  I’ve then multiplied this difference by the number of times the query ran to get a listing.  You can see a couple of queries that are really crying out for some love.
+
+![PBI_2](./images/PBI_2.png)
+
+### Long Running Queries
+
+Basically a listing of queries by running time.  You can then decide if the running time’s acceptable for what the query’s doing, i.e. backup jobs are at the top of the list.
+
+![PBI_3](./images/PBI_3.png)
+
+### Common Queries
+
+Basically a listing of queries by the number of times executed.  These are queries that the developers need to do something about.  The query at the top of the list sometimes runs more that 100 times a second.  We need to ask if that’s really necessary.  
+
+![PBI_4](./images/PBI_4.png)
+
+## Conclusion
+
+With a bit of work and investment we achieved insight to the performance of our unloved MariaDb.  We can present our findings in a highly visual way that everyone can understand thanks to Power BI, we have actionable results and can measure the improvement over time.
