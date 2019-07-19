@@ -1,4 +1,4 @@
-# ETL 
+# ETL
 
 ETL process to read in a MariaDb ‘slow query log’.
 
@@ -101,25 +101,35 @@ Here’s a report I through together.  Beats a text file, processed or unprocess
 
 This shows basic load on the database.  Top graphs shows the numbe of queries, the bottom graph shows the number of rows being returned.  We can see the sync running every half an hour.  You can also click on the graph and it will show the queries running at that time point.
 
-![PBI_1](./images/PBI_1.png)
+![Database Load](./images/PBI_1.png)
+
+### Client Connections
+
+![Client Connetions](./images/PBI_2.png)
 
 ### High Cost Queries
 
 This shows the quick wins.  “High Cost” is defined as the gap between the number of rows examined vs. the number of rows return, i.e. those queries that could benefit from an index.  I’ve then multiplied this difference by the number of times the query ran to get a listing.  You can see a couple of queries that are really crying out for some love.
 
-![PBI_2](./images/PBI_2.png)
+![High Cost Queries](./images/PBI_3.png)
 
 ### Long Running Queries
 
 Basically a listing of queries by running time.  You can then decide if the running time’s acceptable for what the query’s doing, i.e. backup jobs are at the top of the list.
 
-![PBI_3](./images/PBI_3.png)
+![Long Running Queries](./images/PBI_4.png)
 
 ### Common Queries
 
 Basically a listing of queries by the number of times executed.  These are queries that the developers need to do something about.  The query at the top of the list sometimes runs more that 100 times a second.  We need to ask if that’s really necessary.  
 
-![PBI_4](./images/PBI_4.png)
+![Common Queries](./images/PBI_5.png)
+
+### Index Usage
+
+![Index Usage](./images/PBI_6.png)
+
+
 
 ## Conclusion
 
